@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#241b49">
+<title>La princesa durmiente</title>
+<style>
+  :root{
+    --night:#17162f; --plum:#302454; --rose:#f7bad7; --pink:#f5d4e8;
+    --gold:#ffe8a7; --mint:#a8e8cd; --ink:#fff8fe;
+  }
+  *{box-sizing:border-box}
+  html{min-height:100%;background:var(--night)}
+  body{
+    margin:0;min-height:100vh;color:var(--ink);font-family:Georgia,"Times New Roman",serif;
+    background:
+      radial-gradient(ellipse at 50% 0%,rgba(130,93,174,.35),transparent 55%),
+      radial-gradient(ellipse at 8% 80%,rgba(68,126,128,.18),transparent 40%),
+      linear-gradient(160deg,#17162f 0%,#262044 50%,#172c3a 100%);
+    overflow-x:hidden;
+  }
+  body::before,body::after{content:"";position:fixed;pointer-events:none;border-radius:50%;filter:blur(1px);z-index:0}
+  body::before{width:26rem;height:26rem;top:-14rem;right:-8rem;background:rgba(244,173,213,.08)}
+  body::after{width:20rem;height:20rem;bottom:-12rem;left:-7rem;background:rgba(155,231,207,.08)}
+  .page{position:relative;z-index:1;width:min(100% - 28px,980px);margin:0 auto;padding:34px 0 26px}
+  h1{font-size:clamp(2.35rem,7vw,4.7rem);font-weight:400;line-height:.98;letter-spacing:-.045em;text-align:center;margin:0;color:#fff4fb;text-shadow:0 4px 30px rgba(240,172,221,.2)}
+  h1 span{display:block;color:#f5bed9;font-style:italic;font-size:.72em;margin-top:9px;letter-spacing:-.02em}
+  .intro{margin:19px auto 24px;max-width:600px;text-align:center;color:#e3d9f1;font-size:clamp(1rem,2.6vw,1.16rem);line-height:1.65}
+  .scene-shell{position:relative;padding:10px;border-radius:29px;background:linear-gradient(135deg,rgba(255,255,255,.19),rgba(255,255,255,.035) 40%,rgba(245,188,221,.13));box-shadow:0 28px 90px rgba(0,0,0,.27),inset 0 1px 0 rgba(255,255,255,.25)}
+  .scene{position:relative;overflow:hidden;border-radius:21px;border:1px solid rgba(255,255,255,.2);background:#29264d}
+  .scene svg{display:block;width:100%;height:auto;min-height:260px}
+  .scene-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 70px rgba(23,22,47,.16)}
+  .sparkle{transform-box:fill-box;transform-origin:center;animation:twinkle 2.7s ease-in-out infinite}
+  .sparkle:nth-of-type(2n){animation-delay:.9s}
+  .drift{animation:drift 8s ease-in-out infinite}
+  .firefly{animation:firefly 5s ease-in-out infinite alternate}
+  #frogMotion{ /* motion is animated by SVG so it remains crisp at any size */ }
+  .frog-bob{animation:frogBob .48s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center bottom}
+  .wake-eyes{opacity:0;transition:opacity .8s ease}
+  .sleep-eyes{opacity:1;transition:opacity .8s ease}
+  .scene.awake .wake-eyes{opacity:1}
+  .scene.awake .sleep-eyes{opacity:0}
+  .scene.awake .princess-glow{opacity:1}
+  .princess-glow{opacity:0;transition:opacity 1.4s ease}
+  .scene.awake .crown-spark{animation:twinkle 1s ease-in-out infinite alternate}
+  .controls{display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 12px 7px}
+  .story-button{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:11px;min-height:52px;padding:14px 24px;border:1px solid rgba(255,255,255,.45);border-radius:999px;background:linear-gradient(135deg,#f9d7e9,#eaa9ce);color:#492b51;font:700 14px/1 system-ui,sans-serif;letter-spacing:.015em;box-shadow:0 8px 26px rgba(216,130,185,.23),inset 0 1px 0 rgba(255,255,255,.9);cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}
+  .story-button:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(216,130,185,.34),inset 0 1px 0 rgba(255,255,255,.9)}
+  .story-button:active{transform:translateY(0) scale(.985)}
+  .story-button:focus-visible{outline:3px solid #fff2bd;outline-offset:4px}
+  .button-star{font-size:17px;line-height:1}
+  .hint{color:#c7bbdf;font:500 11px/1.5 system-ui,sans-serif;letter-spacing:.07em;text-align:center}
+  .message{max-width:690px;margin:0 auto;padding:4px 20px 8px;text-align:center;opacity:0;transform:translateY(13px);transition:opacity 1.2s ease,transform 1.2s ease;pointer-events:none}
+  .message.revealed{opacity:1;transform:translateY(0)}
+  .message .ornament{display:block;font-size:23px;color:#f6cfe5;margin-bottom:4px;letter-spacing:.3em}
+  .message h2{margin:0 auto 10px;font-size:clamp(1.7rem,5.3vw,2.7rem);font-weight:400;font-style:italic;color:#ffe3f2;line-height:1.15}
+  .message p{margin:0 auto;color:#e9def1;font-size:clamp(1rem,2.7vw,1.19rem);line-height:1.8;max-width:610px}
+  .message .signature{margin-top:13px;color:#efbfdc;font-style:italic;font-size:1.02rem}
+  footer{text-align:center;margin-top:23px;color:rgba(226,215,241,.56);font:500 10px/1.7 system-ui,sans-serif;letter-spacing:.11em}
+  .floating-heart{position:fixed;bottom:-25px;left:var(--left);font-size:var(--size);color:rgba(255,197,226,.68);pointer-events:none;z-index:5;animation:floatHeart var(--dur) linear forwards}
+  @keyframes twinkle{0%,100%{opacity:.38;transform:scale(.75)}50%{opacity:1;transform:scale(1.18)}}
+  @keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  @keyframes firefly{from{opacity:.25;transform:translate(0,0)}to{opacity:1;transform:translate(9px,-13px)}}
+  @keyframes frogBob{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+  @keyframes floatHeart{0%{transform:translateY(0) rotate(-8deg);opacity:0}10%{opacity:.8}100%{transform:translateY(-110vh) rotate(28deg);opacity:0}}
+  @media(min-width:720px){.page{padding-top:43px}.intro{margin-bottom:29px}.scene-shell{padding:12px}.controls{padding-top:27px}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>La princesa <span>durmiente</span></h1>
+  <p class="intro">Dicen que una princesa despierta con un beso. Esta vez basta con una sonrisa… aunque con esos ojitos tan lindos el sapito se va a distraer.</p>
+
+  <section class="scene-shell" aria-label="Cuento ilustrado de la princesa y el sapito">
+    <div class="scene" id="scene">
+      <svg viewBox="0 0 900 540" role="img" aria-labelledby="artTitle artDesc" xmlns="http://www.w3.org/2000/svg">
+        <title id="artTitle">La princesa durmiente y el sapito mágico</title>
+        <desc id="artDesc">Una princesa de cabello largo duerme en un jardín encantado mientras un pequeño sapito verde se acerca para despertarla con magia.</desc>
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="#39345f"/><stop offset=".48" stop-color="#65517e"/><stop offset="1" stop-color="#c084ad"/></linearGradient>
+          <linearGradient id="hills" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#496579"/><stop offset="1" stop-color="#213d4b"/></linearGradient>
+          <linearGradient id="dress" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0fa"/><stop offset=".43" stop-color="#f4b8d8"/><stop offset="1" stop-color="#c675aa"/></linearGradient>
+          <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7b4967"/><stop offset=".5" stop-color="#422b50"/><stop offset="1" stop-color="#291f3e"/></linearGradient>
+          <linearGradient id="frogGreen" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c9f3ad"/><stop offset=".42" stop-color="#70c99c"/><stop offset="1" stop-color="#328a79"/></linearGradient>
+          <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff5c4"/><stop offset="1" stop-color="#d8a85f"/></linearGradient>
+          <radialGradient id="moonGlow"><stop stop-color="#fff8d8" stop-opacity=".45"/><stop offset="1" stop-color="#fff8d8" stop-opacity="0"/></radialGradient>
+          <radialGradient id="magicGlow"><stop stop-color="#fff6d1" stop-opacity=".98"/><stop offset=".34" stop-color="#fbd5ec" stop-opacity=".56"/><stop offset="1" stop-color="#fbd5ec" stop-opacity="0"/></radialGradient>
+          <filter id="softGlow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="9"/></filter>
+          <filter id="shadow" x="-30%" y="-50%" width="160%" height="220%"><feGaussianBlur stdDeviation="7"/></filter>
+          <g id="tinyStar"><path d="M0 -7 1.7 -1.8 7 0 1.7 1.8 0 7 -1.7 1.8 -7 0 -1.7 -1.8Z" fill="#fff3c6"/></g>
+        </defs>
+        <!-- enchanted twilight -->
+        <rect width="900" height="540" fill="url(#sky)"/>
+        <circle cx="713" cy="94" r="120" fill="url(#moonGlow)"/>
+        <circle cx="713" cy="94" r="39" fill="#fff4d1" opacity=".9"/>
+        <circle cx="729" cy="82" r="36" fill="#78658f" opacity=".44"/>
+        <g opacity=".82">
+          <use href="#tinyStar" x="108" y="70" class="sparkle"/><use href="#tinyStar" x="215" y="129" class="sparkle"/>
+          <use href="#tinyStar" x="350" y="60" class="sparkle"/><use href="#tinyStar" x="485" y="105" class="sparkle"/>
+          <use href="#tinyStar" x="615" y="44" class="sparkle"/><use href="#tinyStar" x="822" y="166" class="sparkle"/>
+          <circle cx="166" cy="151" r="2.2" fill="#fff6dd"/><circle cx="298" cy="92" r="1.7" fill="#fff6dd"/><circle cx="558" cy="64" r="2" fill="#fff6dd"/><circle cx="775" cy="220" r="1.8" fill="#fff6dd"/><circle cx="80" cy="203" r="1.4" fill="#fff6dd"/>
+        </g>
+        <!-- distant fairytale castle -->
+        <g opacity=".58" fill="#40365f" stroke="#b59ac0" stroke-opacity=".36" stroke-width="2">
+          <path d="M588 265V180H618V150L636 130 654 150V180H675V204H696V169L714 146 732 169V253Z"/>
+          <path d="M603 180h20v85h-20zM646 180h18v85h-18zM686 204h19v49h-19z" fill="#312b51"/>
+          <path d="M626 130h20M704 146h20" stroke="#d2b8d0"/>
+          <path d="M635 208q8-18 16 0v20h-16zM698 213q7-14 14 0v16h-14z" fill="#fbdca2" stroke="none" opacity=".7"/>
+        </g>
+        <!-- distant hills -->
+        <path d="M0 326Q110 260 223 314T445 302T690 301T900 283V540H0Z" fill="#555274" opacity=".7"/>
+        <path d="M0 374Q131 309 276 363T520 351T760 333T900 359V540H0Z" fill="url(#hills)"/>
+        <!-- enchanted trees framing the scene -->
+        <g opacity=".9">
+          <path d="M0 0H92Q61 63 88 104Q38 136 68 188Q22 229 56 292L0 337Z" fill="#302744"/>
+          <path d="M0 0H51Q31 73 60 110Q14 148 42 199Q9 245 35 293L0 307Z" fill="#46304f"/>
+          <path d="M900 0H819Q843 61 814 111Q862 157 829 209Q874 254 839 309L900 341Z" fill="#2d2948"/>
+          <path d="M900 16H866Q878 81 849 121Q891 163 860 212Q886 247 868 288L900 300Z" fill="#4a3555"/>
+          <g fill="none" stroke-linecap="round" stroke="#9d719a" stroke-opacity=".33" stroke-width="4"><path d="M26 321Q79 255 52 198T65 85"/><path d="M865 311Q827 250 851 204T835 90"/></g>
+        </g>
+        <!-- flowers in the foreground -->
+        <g opacity=".9">
+          <g transform="translate(95 434)"><path d="M0 60Q-7 22 4 0" fill="none" stroke="#73b79a" stroke-width="4"/><path d="M2 38Q-22 24-29 40Q-14 50 2 38" fill="#70b795"/><g fill="#f6c5e0"><ellipse cy="0" ry="12" rx="5"/><ellipse cy="0" ry="12" rx="5" transform="rotate(72)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(144)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(216)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(288)"/></g><circle r="5" fill="#ffe4a3"/></g>
+          <g transform="translate(800 445) scale(.85)"><path d="M0 55Q7 26 0 0" fill="none" stroke="#73b79a" stroke-width="4"/><path d="M1 37Q25 23 31 38Q14 50 1 37" fill="#70b795"/><g fill="#fff0be"><ellipse cy="0" ry="12" rx="5"/><ellipse cy="0" ry="12" rx="5" transform="rotate(72)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(144)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(216)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(288)"/></g><circle r="5" fill="#eca2ca"/></g>
+          <g transform="translate(173 481) scale(.55)"><g fill="#b7d7ff"><ellipse cy="0" ry="12" rx="5"/><ellipse cy="0" ry="12" rx="5" transform="rotate(72)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(144)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(216)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(288)"/></g><circle r="5" fill="#ffe6a5"/></g>
+          <g transform="translate(749 488) scale(.56)"><g fill="#f5c2df"><ellipse cy="0" ry="12" rx="5"/><ellipse cy="0" ry="12" rx="5" transform="rotate(72)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(144)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(216)"/><ellipse cy="0" ry="12" rx="5" transform="rotate(288)"/></g><circle r="5" fill="#ffe6a5"/></g>
+        </g>
+        <!-- soft patch of magical ground -->
+        <ellipse cx="469" cy="453" rx="295" ry="48" fill="#c9b3d2" opacity=".13" filter="url(#shadow)"/>
+        <ellipse cx="478" cy="458" rx="248" ry="32" fill="#203f4c" opacity=".48"/>
+        <!-- flower-covered resting place -->
+        <g>
+          <path d="M282 418Q319 394 354 406Q419 386 483 405Q555 382 626 405Q690 394 733 422L720 456Q503 480 292 452Z" fill="#597e7a" stroke="#a2c4a8" stroke-width="2"/>
+          <path d="M296 426Q425 447 714 425L704 443Q487 465 307 444Z" fill="#335d60"/>
+          <path d="M319 421Q359 410 398 424T482 423T560 421T650 421" fill="none" stroke="#d2b9d2" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+          <g fill="#fff0bc"><circle cx="354" cy="430" r="4"/><circle cx="387" cy="438" r="3"/><circle cx="631" cy="433" r="4"/><circle cx="680" cy="427" r="3"/></g>
+        </g>
+        <!-- princess's flowing hair behind her -->
+        <g id="princess">
+          <path d="M417 350Q402 328 419 308Q438 285 475 295Q518 292 545 315Q562 341 541 368Q521 388 494 405L439 410Q423 391 417 350Z" fill="url(#hair)"/>
+          <path d="M434 327Q425 352 452 376Q465 392 451 410Q424 404 412 378Q401 351 414 325Z" fill="#382646"/>
+          <path d="M442 307Q474 294 508 314Q526 330 522 353Q505 334 483 330Q460 331 442 307Z" fill="#906080" opacity=".55"/>
+          <!-- sweeping dress -->
+          <path d="M438 350Q460 337 490 346Q523 356 548 373Q577 390 620 400Q647 410 640 429Q603 449 545 441Q463 440 389 438Q352 436 340 418Q374 386 414 365Z" fill="url(#dress)" stroke="#ffe5f2" stroke-width="2"/>
+          <path d="M430 369Q470 389 497 426Q451 440 390 431Q369 428 360 418Q389 390 430 369Z" fill="#e89cc5" opacity=".72"/>
+          <path d="M460 352Q477 373 494 385T551 414" fill="none" stroke="#fff5fb" stroke-width="5" opacity=".7" stroke-linecap="round"/>
+          <path d="M370 420Q452 437 538 432" fill="none" stroke="#b6669d" stroke-width="2" opacity=".5"/>
+          <!-- one relaxed arm -->
+          <path d="M479 356Q505 359 523 378Q532 388 545 385Q554 384 560 390Q562 396 552 400Q535 406 516 395L476 378Z" fill="#f8d1c8" stroke="#d98dac" stroke-width="1.3"/>
+          <!-- pillow -->
+          <path d="M525 335Q550 307 589 317Q611 324 614 349Q599 366 568 365Q542 362 525 335Z" fill="#eee0f5" stroke="#fff2fa" stroke-width="2"/>
+          <path d="M541 336Q564 318 588 326" fill="none" stroke="#cba8cf" stroke-width="2" stroke-linecap="round"/>
+          <!-- face and hair -->
+          <path d="M533 319Q540 291 568 291Q596 292 603 314Q612 337 593 351Q575 366 552 349Q535 339 533 319Z" fill="#f8d5c8" stroke="#e9aabd" stroke-width="1.4"/>
+          <path d="M533 321Q527 300 548 286Q574 270 598 289Q615 302 604 329Q596 307 578 306Q561 317 546 311Q543 326 538 337Z" fill="url(#hair)"/>
+          <path d="M542 300Q559 279 583 290" fill="none" stroke="#a77391" stroke-width="4" stroke-linecap="round" opacity=".75"/>
+          <path d="M599 316Q620 336 599 357Q584 369 573 360Q594 345 592 329Z" fill="#49304f"/>
+          <!-- crown -->
+          <g class="crown-spark">
+            <path d="M553 292L548 275L562 284L573 265L583 284L598 275L594 298Z" fill="url(#gold)" stroke="#fff0bc" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="573" cy="283" r="4.5" fill="#e9a4d0"/><circle cx="554" cy="289" r="2.5" fill="#fff6d6"/><circle cx="592" cy="289" r="2.5" fill="#fff6d6"/>
+          </g>
+          <!-- sleeping / awakened eyes -->
+          <g class="sleep-eyes" fill="none" stroke="#855274" stroke-width="2.2" stroke-linecap="round"><path d="M549 326q6 5 12 0"/><path d="M578 326q6 5 12 0"/></g>
+          <g class="wake-eyes" fill="#fffdf9" stroke="#855274" stroke-width="1.2"><ellipse cx="556" cy="325" rx="5.7" ry="7"/><ellipse cx="585" cy="325" rx="5.7" ry="7"/><ellipse cx="557" cy="326" rx="2.7" ry="4.5" fill="#4d3a66" stroke="none"/><ellipse cx="586" cy="326" rx="2.7" ry="4.5" fill="#4d3a66" stroke="none"/><circle cx="558" cy="324" r="1.2" fill="#fff" stroke="none"/><circle cx="587" cy="324" r="1.2" fill="#fff" stroke="none"/></g>
+          <path d="M565 341Q572 346 579 340" fill="none" stroke="#b76a88" stroke-width="2" stroke-linecap="round"/>
+          <ellipse cx="545" cy="336" rx="5" ry="3" fill="#ee9bb4" opacity=".45"/><ellipse cx="595" cy="336" rx="5" ry="3" fill="#ee9bb4" opacity=".45"/>
+          <!-- magical halo after she wakes -->
+          <ellipse class="princess-glow" cx="570" cy="322" rx="115" ry="95" fill="url(#magicGlow)"/>
+        </g>
+        <!-- glow points that the frog carries -->
+        <g id="magicDust" opacity="0">
+          <circle cx="0" cy="0" r="32" fill="url(#magicGlow)"/>
+          <use href="#tinyStar" x="-11" y="-10" fill="#fff4bd"/>
+          <use href="#tinyStar" x="14" y="-18" fill="#fff4bd"/>
+          <circle cx="12" cy="9" r="3" fill="#fff5c6"/>
+          <circle cx="-21" cy="11" r="2" fill="#fff5c6"/>
+        </g>
+        <!-- frog begins at left and hops across the clearing -->
+        <g id="frogTraveler" transform="translate(148 411)">
+          <animateMotion id="frogMotion" begin="indefinite" dur="6.1s" fill="freeze" path="M 0 0 C 38 -84, 66 -82, 101 -4 S 154 18, 188 -23 S 231 -77, 266 -34 S 303 8, 340 -25"/>
+          <g class="frog-bob">
+            <ellipse cx="5" cy="28" rx="39" ry="8" fill="#132b3c" opacity=".33" filter="url(#shadow)"/>
+            <!-- hind legs -->
+            <path d="M-13 12Q-30 10-37 23Q-39 31-28 32L-9 27Q2 24 4 16Z" fill="#55ad91" stroke="#2d7d73" stroke-width="2"/>
+            <path d="M20 13Q36 8 44 20Q47 28 36 31L17 25Q10 22 12 16Z" fill="#55ad91" stroke="#2d7d73" stroke-width="2"/>
+            <ellipse cx="-30" cy="31" rx="11" ry="4" fill="#9ae0b0"/><ellipse cx="39" cy="30" rx="10" ry="4" fill="#9ae0b0"/>
+            <!-- body -->
+            <ellipse cx="5" cy="7" rx="31" ry="24" fill="url(#frogGreen)" stroke="#28776e" stroke-width="2.4"/>
+            <ellipse cx="8" cy="15" rx="19" ry="13" fill="#b4e6a6" opacity=".78"/>
+            <path d="M-10 2Q-1 -4 8 1" fill="none" stroke="#d8fac3" stroke-width="3" stroke-linecap="round" opacity=".75"/>
+            <!-- front feet -->
+            <path d="M18 17Q25 26 37 27Q44 30 41 35Q34 39 23 32L13 25Z" fill="#70c99c" stroke="#28776e" stroke-width="1.8"/>
+            <path d="M-3 20Q-5 29 4 31Q12 32 13 37Q6 41-3 35L-10 27Z" fill="#70c99c" stroke="#28776e" stroke-width="1.8"/>
+            <!-- head, eyes and smile -->
+            <path d="M-24 0Q-22 -20-6 -24Q10 -28 23 -17Q33 -11 29 3Q20 15 0 14Q-18 12-24 0Z" fill="url(#frogGreen)" stroke="#28776e" stroke-width="2.2"/>
+            <ellipse cx="-13" cy="-20" rx="9" ry="11" fill="#8ed9a9" stroke="#28776e" stroke-width="1.6"/>
+            <ellipse cx="13" cy="-19" rx="9" ry="11" fill="#8ed9a9" stroke="#28776e" stroke-width="1.6"/>
+            <ellipse cx="-12" cy="-20" rx="4.5" ry="6" fill="#fff9dc"/><ellipse cx="14" cy="-19" rx="4.5" ry="6" fill="#fff9dc"/>
+            <ellipse cx="-11" cy="-19" rx="2.2" ry="3.5" fill="#263d50"/><ellipse cx="15" cy="-18" rx="2.2" ry="3.5" fill="#263d50"/>
+            <circle cx="-12" cy="-21" r="1.2" fill="#fff"/><circle cx="14" cy="-20" r="1.2" fill="#fff"/>
+            <path d="M-13 3Q0 12 15 2" fill="none" stroke="#286f68" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="-22" cy="0" r="3" fill="#e995aa" opacity=".8"/><circle cx="23" cy="0" r="3" fill="#e995aa" opacity=".8"/>
+            <!-- tiny golden leaf crown -->
+            <path d="M-17 -30Q-25 -44-12 -41Q-5 -39-6 -29Q1 -47 8 -39Q14 -32 3 -25Z" fill="url(#gold)" stroke="#fff0bd" stroke-width="1.4"/>
+            <circle cx="-5" cy="-31" r="2" fill="#fff9db"/>
+          </g>
+        </g>
+        <!-- little fireflies -->
+        <g class="firefly"><circle cx="230" cy="329" r="11" fill="#ffe8a7" opacity=".18"/><circle cx="230" cy="329" r="2.4" fill="#fff2bd"/></g>
+        <g class="firefly" style="animation-delay:1.8s"><circle cx="751" cy="367" r="13" fill="#ffe8a7" opacity=".16"/><circle cx="751" cy="367" r="2.5" fill="#fff2bd"/></g>
+        <g class="firefly" style="animation-delay:2.6s"><circle cx="323" cy="279" r="9" fill="#ffc9e5" opacity=".19"/><circle cx="323" cy="279" r="2" fill="#fff0fa"/></g>
+        <g id="endingStars" opacity="0">
+          <use href="#tinyStar" x="515" y="274" class="sparkle"/><use href="#tinyStar" x="633" y="299" class="sparkle"/><use href="#tinyStar" x="601" y="255" class="sparkle"/><use href="#tinyStar" x="542" y="285" class="sparkle"/>
+        </g>
+      </svg>
+      <div class="scene-vignette"></div>
+    </div>
+  </section>
+
+  <div class="controls">
+    <button class="story-button" id="replayButton" type="button"><span class="button-star" aria-hidden="true">✧</span><span id="buttonText">A ver si despierta esta princesa…</span><span class="button-star" aria-hidden="true">✧</span></button>
+    <div class="hint" id="hintText" aria-live="polite">Toca aquí y deja que el sapito haga lo suyo </div>
+  </div>
+
+  <section class="message" id="message" aria-live="polite" aria-atomic="true">
+    <span class="ornament" aria-hidden="true">✧ · ✧ · ✧</span>
+    <h2>Despierta, princesa bella…</h2>
+    <p>Ya despierta, princesa. Este sapito solo quería verte sonreír. Es que esos ojitos tuyos están demasiado lindos y tu sonrisa tiene algo que engancha. No sé si te lo han dicho hoy pero tienes una mirada difícil de olvidar.</p>
+    <p class="signature">A ver cuándo me regalas esa sonrisa en persona. Y sí… también quiero ver esos ojitos de cerca. ✧</p>
+  </section>
+  <footer>UN SAPITO · UNA PRINCESA · UNA SONRISA </footer>
+</div>
+<script>
+(() => {
+  const scene = document.getElementById('scene');
+  const message = document.getElementById('message');
+  const motion = document.getElementById('frogMotion');
+  const button = document.getElementById('replayButton');
+  const buttonText = document.getElementById('buttonText');
+  const hintText = document.getElementById('hintText');
+  const magicDust = document.getElementById('magicDust');
+  const endingStars = document.getElementById('endingStars');
+  let timers = [];
+  let hasStarted = false;
+
+  function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+  function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+  function sprinkleHearts(){
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce) return;
+    for(let i=0;i<7;i++){
+      later(() => {
+        const heart=document.createElement('span');
+        heart.className='floating-heart'; heart.setAttribute('aria-hidden','true');
+        heart.textContent = i%3===0 ? '✧' : '✧';
+        heart.style.setProperty('--left', (12+Math.random()*76)+'vw');
+        heart.style.setProperty('--size',(12+Math.random()*13)+'px');
+        heart.style.setProperty('--dur',(5+Math.random()*3)+'s');
+        document.body.appendChild(heart);
+        later(()=>heart.remove(),8500);
+      }, i*190);
+    }
+  }
+  function startStory(){
+    clearTimers();
+    scene.classList.remove('awake');
+    message.classList.remove('revealed');
+    magicDust.setAttribute('opacity','0');
+    endingStars.setAttribute('opacity','0');
+    buttonText.textContent='Ahí va el sapito, princesa…';
+    hintText.textContent='No te duermas todavía… ya casi llega ';
+    button.disabled=true;
+    button.style.opacity='.82';
+    // Restart the inline SVG motion animation.
+    try { motion.endElement(); } catch(e) {}
+    try { motion.beginElement(); } catch(e) {}
+    // A soft magical shimmer appears near the princess close to the end.
+    later(()=>{ magicDust.setAttribute('opacity','1'); magicDust.setAttribute('transform','translate(560 327)'); },4400);
+    later(()=>{
+      scene.classList.add('awake');
+      endingStars.setAttribute('opacity','1');
+      message.classList.add('revealed');
+      buttonText.textContent='Que vuelva el sapito ';
+      hintText.textContent='Misión cumplida: princesa despierta… ¿y esa sonrisa? ✧';
+      button.disabled=false;
+      button.style.opacity='1';
+      sprinkleHearts();
+    },6100);
+    hasStarted=true;
+  }
+  button.addEventListener('click',startStory);
+  // Start gently on page load; the button remains available to replay the story.
+  window.addEventListener('load',()=>later(startStory,700));
+})();
+</script>
+</body>
+</html>
